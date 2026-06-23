@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: agency-king-ai
+    runtime: node
+    buildCommand: echo "No build required"
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: HOST
+        value: 0.0.0.0
+      - key: VITE_PUBLIC_TEST_MODE
+        value: false

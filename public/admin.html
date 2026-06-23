@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agency King - Admin test</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <strong>Agency King</strong>
+        <span>Dashboard admin test</span>
+      </div>
+      <a href="/">Retour tunnel</a>
+    </header>
+    <main class="shell">
+      <section class="hero compact">
+        <span id="testBadge" class="admin-badge" hidden>Mode test actif</span>
+        <p class="eyebrow">Pilotage</p>
+        <h1>Dashboard admin simple</h1>
+        <p>Vue locale des analyses, achats de validation et synchronisations Brevo.</p>
+      </section>
+
+      <section id="metrics" class="metrics"></section>
+
+      <section class="panel">
+        <h2>Validation du tunnel</h2>
+        <div class="grid">
+          <label>Contact à utiliser
+            <select id="contactSelect"></select>
+          </label>
+          <label>Étape
+            <select id="adminAction">
+              <option value="CHECKUP_27">Achat 17€</option>
+              <option value="BUMP_17">Décodeur 17€</option>
+              <option value="UPSELL_97">Session 75€</option>
+              <option value="RDV_INTERESSE">Intérêt RDV</option>
+              <option value="RDV_RESERVE">RDV réservé</option>
+            </select>
+          </label>
+        </div>
+        <button id="runAdminAction" type="button">Valider cette étape</button>
+        <p id="adminActionStatus" class="status"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Créer une campagne Brevo</h2>
+        <form id="campaignForm" class="campaign-form">
+          <div class="grid">
+            <label>Nom campagne <input required name="name" value="Campaign sent via the API"></label>
+            <label>Objet <input required name="subject" value="Votre score est prêt."></label>
+            <label>Expéditeur nom <input required name="senderName" value="Agency King"></label>
+            <label>Expéditeur email <input required name="senderEmail" type="email" value="contact@agency-king.com"></label>
+            <label>IDs listes Brevo <input required name="listIds" placeholder="Ex. 2,7"></label>
+            <label>Planifier à <input name="scheduledAt" placeholder="2026-06-08T14:00:00+02:00"></label>
+            <label class="wide">Contenu HTML <textarea required name="htmlContent"><p>Votre score est prêt. Connectez-vous au rapport Agency King pour voir les blocages détectés et les prochaines opportunités.</p></textarea></label>
+          </div>
+          <button type="submit">Créer la campagne test</button>
+          <p id="campaignStatus" class="status"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Dernières analyses</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Entreprise</th>
+                <th>Secteur</th>
+                <th>Score</th>
+                <th>Niveau</th>
+                <th>Risque</th>
+              </tr>
+            </thead>
+            <tbody id="diagnosticsTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Derniers contacts</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Entreprise</th>
+                <th>Email</th>
+                <th>Secteur</th>
+                <th>Localisation</th>
+              </tr>
+            </thead>
+            <tbody id="contactsTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Logs Brevo</h2>
+        <div id="brevoLogs" class="logs"></div>
+      </section>
+    </main>
+    <script src="/assets/admin.js"></script>
+  </body>
+</html>

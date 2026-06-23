@@ -1,0 +1,76 @@
+{
+  "folderName": "Agency King - Check-Up Acquisition",
+  "lists": [
+    "Leads Check-Up",
+    "Clients 27€",
+    "Clients Décodeur",
+    "Clients 97€",
+    "Clients Session Stratégique",
+    "Clients Accompagnement"
+  ],
+  "tags": [
+    "CHECKUP_STARTED",
+    "CHECKUP_COMPLETED",
+    "CHECKUP_27",
+    "BUMP_17",
+    "UPSELL_97",
+    "CALL_297",
+    "ACCOMPAGNEMENT"
+  ],
+  "segments": [
+    { "name": "RISQUE_FAIBLE", "attribute": "AK_RISK", "operator": "equals", "value": "Faible" },
+    { "name": "RISQUE_MOYEN", "attribute": "AK_RISK", "operator": "equals", "value": "Moyen" },
+    { "name": "RISQUE_ELEVE", "attribute": "AK_RISK", "operator": "equals", "value": "Eleve" },
+    { "name": "INVISIBLE", "attribute": "AK_MATURITY", "operator": "equals", "value": "Invisible" },
+    { "name": "VISIBLE_VULNERABLE", "attribute": "AK_MATURITY", "operator": "equals", "value": "Visible mais vulnerable" },
+    { "name": "CHALLENGER", "attribute": "AK_MATURITY", "operator": "equals", "value": "Challenger" },
+    { "name": "LEADER_LOCAL", "attribute": "AK_MATURITY", "operator": "equals", "value": "Leader local" }
+  ],
+  "contactAttributes": [
+    "AK_COMPANY",
+    "AK_SECTOR",
+    "AK_LOCATION",
+    "AK_WEBSITE",
+    "AK_FACEBOOK",
+    "AK_LINKEDIN",
+    "AK_GOOGLE_BUSINESS",
+    "AK_MAIN_OFFER",
+    "AK_TARGET_CLIENT",
+    "AK_COMMERCIAL_MESSAGE",
+    "AK_MAIN_OBJECTIVE",
+    "AK_COMPETITOR_1",
+    "AK_COMPETITOR_2",
+    "AK_COMPETITOR_3",
+    "AK_SCORE",
+    "AK_MATURITY",
+    "AK_RISK",
+    "AK_REPORT_URL",
+    "AK_LAST_EVENT",
+    "AK_TAGS",
+    "AK_LAST_PURCHASE",
+    "AK_DEAL_STAGE",
+    "AK_CALENDLY_URL"
+  ],
+  "pipeline": {
+    "name": "Agency King - Acquisition PME",
+    "stages": [
+      "Nouveau Lead",
+      "Diagnostic Terminé",
+      "Client 27€",
+      "Client 97€",
+      "RDV Réservé",
+      "Proposition Envoyée",
+      "Client Accompagnement"
+    ]
+  },
+  "events": {
+    "CHECKUP_STARTED": "checkup_started",
+    "CHECKUP_COMPLETED": "checkup_completed",
+    "CHECKUP_27": "checkup_27_purchased",
+    "BUMP_17": "decoder_17_purchased",
+    "UPSELL_97": "premium_97_purchased",
+    "CALL_297": "call_297_purchased",
+    "ACCOMPAGNEMENT": "accompagnement_signed"
+  }
+}
+

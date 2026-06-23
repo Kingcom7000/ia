@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "functions": {
+    "api/handler.mjs": {
+      "runtime": "nodejs22.x",
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    { "source": "/session-strategique", "destination": "/session-strategique.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/api/:path*", "destination": "/api/handler" }
+  ]
+}

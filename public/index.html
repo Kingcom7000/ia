@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Agency King - Le Révélateur de Clients Perdus™</title>
+    <link rel="stylesheet" href="/assets/styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">
+        <img src="/assets/kingcom-logo.png" alt="Kingcom">
+      </a>
+      <nav>
+        <a href="https://agency-king.com/" target="_blank" rel="noreferrer">Agence</a>
+        <a href="/session-strategique">Session stratégique</a>
+      </nav>
+    </header>
+
+    <main>
+      <section id="landing" class="hero-section view active">
+        <div class="hero-copy">
+          <div id="socialProofSection" class="social-proof"></div>
+          <p class="eyebrow ai-badge">Agency King AI™</p>
+          <h1 id="salesH1">Pourquoi certains concurrents gagnent-ils plus de clients que vous ?</h1>
+          <p class="lead" id="salesSubtitle">Analysez votre site, vos réseaux sociaux et vos concurrents pour comprendre ce qui influence réellement la décision de vos prospects.</p>
+          <div class="hero-sources">
+            <span>✓ Site web</span>
+            <span>✓ Facebook</span>
+            <span>✓ LinkedIn</span>
+            <span>✓ Google Business</span>
+            <span>✓ Concurrents</span>
+          </div>
+          <div class="hero-actions">
+            <button class="primary" data-start>Lancer mon analyse</button>
+            <button class="ghost" id="exampleButton" type="button">Voir un exemple</button>
+          </div>
+          <div id="guaranteeSales" class="guarantee-block"></div>
+        </div>
+        <aside class="assurance-panel">
+          <div class="ai-console">
+            <div class="console-top"><span></span><span></span><span></span></div>
+            <div class="console-score">
+              <small>DOMINATION SCORE™</small>
+              <strong>49</strong>
+              <em>/100</em>
+            </div>
+            <div class="console-lines">
+              <i style="--w:78%"></i>
+              <i style="--w:52%"></i>
+              <i style="--w:64%"></i>
+              <i style="--w:41%"></i>
+            </div>
+            <p>IA propriétaire de lecture concurrentielle, pensée pour les indépendants et PME.</p>
+          </div>
+          <p class="panel-kicker">Analyse connectée</p>
+          <div class="assurance-item"><span>01</span><strong>Présence digitale</strong></div>
+          <div class="assurance-item"><span>02</span><strong>Décision prospect</strong></div>
+          <div class="assurance-item"><span>03</span><strong>Écart concurrentiel</strong></div>
+          <div class="assurance-item"><span>04</span><strong>Opportunités détectées</strong></div>
+          <div id="scarcityBlock" class="scarcity-block"></div>
+        </aside>
+      </section>
+
+      <section id="valueStackSection" class="value-stack-section"></section>
+
+      <section id="diagnostic" class="consultation view">
+        <div class="consultation-intro">
+          <p class="eyebrow">Mini-analyse digitalisée</p>
+          <h2>Commençons simplement.</h2>
+          <p>Quelques informations suffisent pour comprendre ce qui peut aider ou freiner une demande de devis avant même qu’un prospect vous contacte.</p>
+        </div>
+        <form id="checkupForm" class="consultation-card">
+          <div class="progress">
+            <span id="progressLabel">Étape 1 sur 5</span>
+            <div><i id="progressBar"></i></div>
+          </div>
+
+          <fieldset class="step active" data-step="1">
+            <h3>Commençons par votre entreprise.</h3>
+            <label>Email <input required name="email" type="email" placeholder="vous@entreprise.be"></label>
+            <label>Nom de l'entreprise <input required name="company" placeholder="Ex. Menuiserie Dupont"></label>
+          </fieldset>
+
+          <fieldset class="step" data-step="2">
+            <h3>Où souhaitez-vous attirer plus de clients ?</h3>
+            <label>Secteur <input required name="sector" placeholder="Ex. construction, comptabilité, horeca"></label>
+            <label>Localisation <input required name="location" placeholder="Ex. Mons, Namur, Wallonie"></label>
+          </fieldset>
+
+          <fieldset class="step" data-step="3">
+            <h3>Où vos prospects peuvent-ils vous comparer ?</h3>
+            <label>Site web <input name="website" placeholder="https://..."></label>
+            <label>Facebook <input name="facebook" placeholder="https://facebook.com/..."></label>
+            <label>LinkedIn <input name="linkedin" placeholder="https://linkedin.com/company/..."></label>
+            <label>Google Business <input name="googleBusiness" placeholder="Nom ou lien de votre fiche"></label>
+          </fieldset>
+
+          <fieldset class="step" data-step="4">
+            <h3>Que vendez-vous principalement ?</h3>
+            <label>Offre principale <input required name="mainOffer" placeholder="Votre offre la plus importante"></label>
+            <label>Client cible <input required name="targetClient" placeholder="Qui voulez-vous attirer ?"></label>
+            <label>Message commercial actuel <textarea name="commercialMessage" placeholder="Votre promesse actuelle, même imparfaite"></textarea></label>
+            <label>Objectif principal <input required name="mainObjective" placeholder="Plus de contacts, de devis, de rendez-vous..."></label>
+          </fieldset>
+
+          <fieldset class="step" data-step="5">
+            <h3>Avec qui vos prospects vous comparent-ils ?</h3>
+            <label>Concurrent 1 <input required name="competitor1" placeholder="Nom ou site"></label>
+            <label>Concurrent 2 <input required name="competitor2" placeholder="Nom ou site"></label>
+            <label>Concurrent 3 <input required name="competitor3" placeholder="Nom ou site"></label>
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="button" class="ghost" id="backButton">Retour</button>
+            <button type="button" class="primary" id="nextButton">Continuer</button>
+          </div>
+          <p id="formStatus" class="status"></p>
+        </form>
+      </section>
+
+      <section id="analysis" class="analysis-screen view">
+        <div class="analysis-card">
+          <div class="analysis-orb"></div>
+          <p class="eyebrow ai-badge">Agency King AI™</p>
+          <h2>Moteur d’analyse en cours.</h2>
+          <p id="analysisText">Initialisation du moteur propriétaire…</p>
+          <div id="analysisSteps" class="analysis-steps"></div>
+          <small>Temps estimé : 2 à 3 minutes. Version de démonstration accélérée.</small>
+        </div>
+      </section>
+
+      <section id="partialResult" class="result-page view">
+        <div class="result-stage">
+          <div class="result-copy">
+            <p class="eyebrow ai-badge">AI Insights™</p>
+            <h2>Votre décision prospect est lisible en 30 secondes.</h2>
+            <p id="personalizedPhrase"></p>
+          </div>
+          <div class="score-spectacular">
+            <span class="score-label">DOMINATION SCORE™</span>
+            <strong id="scoreValue">--</strong>
+            <span id="maturityBadge">--</span>
+            <small>Score calculé à partir de votre présence digitale et de la comparaison concurrentielle.</small>
+          </div>
+        </div>
+
+        <div id="resultCards" class="result-triad"></div>
+
+        <div class="competitor-strip">
+          <div>
+            <p class="eyebrow">Concurrent principal</p>
+            <h3>Le choix se joue contre une alternative perçue comme plus simple.</h3>
+          </div>
+          <div id="competitorComparison" class="comparison-bars"></div>
+        </div>
+
+        <div class="locked-zone">
+          <p class="eyebrow">Insights verrouillés</p>
+          <h3>Débloquez la lecture complète du moteur Agency King AI™.</h3>
+          <div class="locked-grid">
+            <article>🔒 Pourquoi un prospect peut demander un devis à vos concurrents</article>
+            <article>🔒 Le concurrent qui risque de capter le plus de demandes</article>
+            <article>🔒 Le moment précis où la prise de contact peut se bloquer</article>
+            <article>🔒 Ce que vous pourriez changer pour récupérer plus vite des demandes</article>
+            <article>🔒 Les priorités qui peuvent éviter de laisser filer des clients</article>
+          </div>
+          <button class="primary" data-checkout>Débloquer mon analyse complète — 17€</button>
+        </div>
+      </section>
+
+      <section id="checkout" class="checkout-page view">
+        <div class="checkout-card">
+          <p class="eyebrow">Lecture complète</p>
+          <h2>Le Révélateur de Clients Perdus™</h2>
+          <p>Découvrez votre Indice de Domination Locale™ et les euros que vous laissez sur la table chaque mois.</p>
+          <div class="price-row"><span>Prix de lancement <del>47€</del></span><strong>17€</strong></div>
+          <button class="primary" id="completePaymentButton">Voir ce qui me coûte des demandes</button>
+          <div id="guaranteeCheckout" class="guarantee-block"></div>
+        </div>
+      </section>
+
+      <section id="fullReport" class="result-page view">
+        <div class="result-stage">
+          <div class="result-copy">
+            <p class="eyebrow">Lecture complète</p>
+            <h2>Vous voyez maintenant pourquoi une partie des demandes peut partir ailleurs.</h2>
+            <p id="fullReportIntro"></p>
+          </div>
+          <div class="score-spectacular blue">
+            <span class="score-label">Lecture complète</span>
+            <strong id="fullScoreValue">--</strong>
+            <span id="riskBadge">Risque --</span>
+          </div>
+        </div>
+        <div id="fullReportContent" class="report-grid"></div>
+        <div class="next-step-choice">
+          <div class="choice-heading">
+            <p class="eyebrow ai-badge">Prochaine étape</p>
+            <h2>Transformons vos résultats en plan d’action clair.</h2>
+            <p>Réservez 1h avec Lindsay pour reprendre vos résultats, aller plus loin que l’analyse automatique et recevoir un audit PDF plus précis par mail à la fin du rendez-vous.</p>
+          </div>
+          <div class="choice-grid single">
+            <article class="choice-card recommended call-only-card">
+              <span class="choice-tag">Accompagnement humain</span>
+              <h3>Appel 1h avec Lindsay + audit PDF</h3>
+              <p>Nous reprenons vos résultats ensemble, nous déterminons les priorités réelles, puis vous recevez un audit PDF plus précis par mail à la fin du rendez-vous.</p>
+              <div class="price-row compact"><span>Session stratégique</span><strong>75€</strong></div>
+              <ul>
+                <li>1h d’échange avec Lindsay</li>
+                <li>Priorités décidées pendant l’appel</li>
+                <li>Audit PDF envoyé après le RDV</li>
+              </ul>
+              <a class="button primary" id="chooseCallLink" href="/session-strategique">Réserver l’appel 1h — 75€</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="premiumCheckout" class="checkout-page view">
+        <div class="checkout-card premium-checkout">
+          <p class="eyebrow">Session stratégique</p>
+          <h2>Allons plus loin pendant 1h.</h2>
+          <p>Si vous voulez quelque chose de plus précis que l’analyse automatique, réservez un appel avec Lindsay. Vous recevrez ensuite votre audit PDF par mail à la fin du rendez-vous.</p>
+          <div class="price-row"><span>Appel 1h + audit PDF</span><strong>75€</strong></div>
+          <div class="premium-list">
+            <p>Inclus :</p>
+            <ul>
+              <li>1h d’échange avec Lindsay</li>
+              <li>lecture plus précise de vos résultats</li>
+              <li>priorités concrètes à corriger</li>
+              <li>audit PDF envoyé après le rendez-vous</li>
+            </ul>
+          </div>
+          <a class="button primary" href="/session-strategique">Réserver l’appel 1h — 75€</a>
+          <button class="ghost full-width" id="backToReportButton" type="button">Relire mon rapport 17€</button>
+        </div>
+      </section>
+
+      <section id="upsellSuccess" class="checkout-page view">
+        <div class="checkout-card">
+          <p class="eyebrow">Session stratégique</p>
+          <h2>Réservez votre appel avec Lindsay.</h2>
+          <p>Nous transformons vos constats en priorités concrètes pendant 1h, puis vous recevez votre audit PDF par mail à la fin du rendez-vous.</p>
+          <a class="button primary" id="sessionLink" href="/session-strategique">Réserver ma session stratégique</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="/assets/cro-config.js"></script>
+    <script src="/assets/app.js"></script>
+  </body>
+</html>
