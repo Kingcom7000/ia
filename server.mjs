@@ -1168,10 +1168,19 @@ function emptyDb() {
 
 async function writeDb(db) {
   dbWriteQueue = dbWriteQueue.then(async () => {
-    await mkdir(DATA_DIR, { recursive: true });
-    const tempFile = `${DB_FILE}.tmp`;
-    await writeFile(tempFile, JSON.stringify(db, null, 2));
-    await rename(tempFile, DB_FILE);
+    try {
+      await mkdir(DATA_DIR, { recursive: true });
+      const tempFile = `${DB_FILE}.tmp`;
+      await writeFile(tempFile, JSON.stringify(db, null, 2));
+      await rename(tempFile, DB_FILE);
+    } catch (err) {
+      // Sur Vercel (filesystem read-only), on garde les données en mémoire uniquement
+      if (err.code === "EROFS" || err.code === "ENOENT") {
+        console.warn("Filesystem read-only, données conservées en mémoire uniquement.");
+      } else {
+        throw err;
+      }
+    }
   });
   await dbWriteQueue;
 }
