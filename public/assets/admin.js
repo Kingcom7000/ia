@@ -58,7 +58,7 @@ async function loadDashboard() {
     ["Terminés", metrics.diagnosticsCompleted],
     ["Ventes 17€", metrics.sales27],
     ["Décodeurs 17€", metrics.bumps17],
-    ["Sessions 75€", metrics.sales97],
+    ["Échanges 30 min", metrics.sales97],
     ["RDV Calendly", metrics.bookings],
     ["Erreurs Brevo", metrics.brevoErrors],
     ["Conv. 17€", `${metrics.conversion27}%`],

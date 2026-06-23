@@ -55,7 +55,7 @@ Le tunnel crée les paiements via l'API Mollie côté serveur :
 
 - `CHECKUP_27` : 17€
 - `BUMP_17` : 17€
-- `UPSELL_97` : 75€ (session stratégique 1h)
+- `UPSELL_97` : échange de 30 min avec Lindsay, sans paiement à la fin du tunnel
 
 Routes utilisées :
 

@@ -83,7 +83,7 @@ function renderCroBlocks() {
 
   document.querySelector("#valueStackSection").innerHTML = `
     <div class="value-stack">
-      <p class="eyebrow">Valeur reçue aujourd’hui</p>
+      <p class="eyebrow">Outil propriétaire Kingcom</p>
       <h2>${escapeHtml(CRO.product?.name || "Le Révélateur de Clients Perdus™")}</h2>
       <p>${escapeHtml(CRO.product?.subtitle || "")}</p>
       <div class="value-lines">
@@ -168,13 +168,13 @@ async function submitDiagnostic() {
 
 async function runAnalysisAnimation() {
   const steps = [
-    "Analyse du site web",
+    "Lecture Kingcom du site web",
     "Analyse Facebook",
     "Analyse LinkedIn",
     "Analyse Google Business",
     "Analyse des concurrents",
     "Calcul du score",
-    "Détection des opportunités",
+    "Détection Kingcom des opportunités",
   ];
 
   const stepsNode = document.querySelector("#analysisSteps");
@@ -200,7 +200,8 @@ async function runAnalysisAnimation() {
 function renderPartialResult() {
   const company = currentPayload.company;
   const competitors = [currentPayload.competitor1, currentPayload.competitor2, currentPayload.competitor3];
-  const competitorScores = buildComparisonScores(currentResult.score);
+  const competitorRows = buildCompetitorComparisonRows({ company, competitors, score: currentResult.score, digital: currentResult.analysis });
+  const threateningName = getThreateningCompetitor(currentResult.analysis?.competitors || [])?.name || "un concurrent à confirmer";
 
   document.querySelector("#scoreValue").textContent = currentResult.score;
   document.querySelector("#maturityBadge").textContent = currentResult.maturity;
@@ -212,7 +213,7 @@ function renderPartialResult() {
     {
       label: "AI Insights™",
       value: "Votre entreprise paraît crédible.",
-      text: `Mais ${competitors[0]} peut sembler plus simple à choisir si sa valeur est plus vite comprise.`,
+      text: `Mais ${threateningName} peut sembler plus simple à choisir si sa valeur est plus vite comprise.`,
       meta: "Insight principal",
     },
     {
@@ -247,16 +248,14 @@ function renderPartialResult() {
   `);
 
   document.querySelector("#competitorComparison").innerHTML = [
-    { name: company, score: currentResult.score, type: "you" },
-    { name: competitors[0], score: competitorScores[0] },
-    { name: competitors[1], score: competitorScores[1] },
-    { name: competitors[2], score: competitorScores[2] },
+    { name: company, score: currentResult.score, type: "you", label: "Votre entreprise" },
+    ...competitorRows,
   ]
     .map((item) => `
       <div class="comparison-row ${item.type === "you" ? "is-you" : ""}">
         <div>
           <strong>${escapeHtml(item.name)}</strong>
-          <span>${item.type === "you" ? "Votre entreprise" : "Concurrent perçu"}</span>
+          <span>${escapeHtml(item.label || "Concurrent à confirmer")}</span>
         </div>
         <i><b style="width:${item.score}%"></b></i>
         <em>${item.score}</em>
@@ -333,7 +332,9 @@ function renderFullReport() {
   const digital = currentResult.analysis;
   const observed = buildObservedContext({ company, sector, location, offer, target, competitors });
   const dimensions = buildDimensionScores(currentResult.score, digital);
-  const threatening = buildThreateningCompetitor({ company, sector, location, offer, competitors, observed });
+  const competitorContext = buildOfferComparisonContext({ company, sector, offer, competitors, digital });
+  const threatening = buildThreateningCompetitor({ company, sector, location, offer, competitors, digital, competitorContext });
+  const mainCompetitorName = threatening.name || "les concurrents indiqués";
   const revenueLoss = estimateMonthlyRevenueLoss(currentResult.score, sector, target);
 
   document.querySelector("#fullScoreValue").textContent = currentResult.score;
@@ -350,7 +351,7 @@ function renderFullReport() {
   const unclearStill = [
     `Le prospect peut ne pas comprendre assez vite pourquoi choisir ${company} plutôt qu’un autre acteur de ${sector}.`,
     `Le bénéfice concret pour ${target} mérite d’être plus évident dès le premier écran.`,
-    `La différence avec ${competitors[0]} n’est pas encore suffisamment nette dans cette première lecture.`,
+    `La différence avec ${mainCompetitorName} n’est pas encore suffisamment nette dans cette première lecture.`,
   ];
 
   const hesitation = [
@@ -393,7 +394,7 @@ function renderFullReport() {
     {
       observation: `Dans les éléments fournis, l’offre "${offer}" existe, mais la raison immédiate de choisir ${company} doit être plus explicite.`,
       analysis: `Quand plusieurs entreprises semblent capables de répondre, le prospect contacte souvent celle qui réduit le plus vite son doute.`,
-      consequence: `Des demandes de devis peuvent partir chez ${competitors[0]} même si votre travail est meilleur.`,
+      consequence: `Des demandes de devis peuvent partir chez ${mainCompetitorName} même si votre travail est meilleur.`,
       action: `Ajouter une phrase courte qui répond à : "Pourquoi demander à ${company} plutôt qu’à une autre option ?"`,
       priority: "Élevée",
     },
@@ -430,36 +431,14 @@ function renderFullReport() {
     },
     {
       action: `Créer une courte section "Pourquoi nous contacter plutôt que comparer encore ?"`,
-      why: `Cette section répond à l’hésitation du prospect au moment exact où il peut partir voir ${competitors[0]}.`,
+      why: `Cette section répond à l’hésitation du prospect au moment exact où il peut partir voir ${mainCompetitorName}.`,
       where: "Avant le formulaire de contact ou près du bouton de demande de devis.",
       impact: 4,
       effort: 3,
     },
   ];
 
-  const competitorReads = competitors.map((competitor, index) => ({
-    name: competitor,
-    better: [
-      `une promesse peut-être plus directe pour un prospect de ${sector}`,
-      `un repère plus rassurant au moment de demander un devis`,
-      `une impression de choix plus simple`,
-    ][index],
-    reassurance: [
-      `Si ${competitor} explique plus vite le résultat attendu, le prospect a moins d’effort à faire.`,
-      `Si ${competitor} montre mieux ses preuves, le prospect peut se sentir plus en sécurité.`,
-      `Si ${competitor} rend la prise de contact plus évidente, il peut capter une demande avant ${company}.`,
-    ][index],
-    recover: [
-      `clarifier en une phrase pourquoi ${company} est un bon choix pour ${offer}`,
-      `placer les preuves avant que le prospect n’ait besoin de les chercher`,
-      `réduire le nombre d’étapes mentales avant la demande de devis`,
-    ][index],
-    premium: [
-      `quels éléments précis donnent cet avantage à ${competitor}`,
-      `quelles preuves ou contenus influencent vraiment la comparaison`,
-      `quelles actions permettraient à ${company} de reprendre l’avantage sans copier ${competitor}`,
-    ][index],
-  }));
+  const competitorReads = buildCompetitorReads({ company, sector, offer, competitors, digital, competitorContext });
 
   const aiAnswer = currentResult.score >= 75 ? "Partiellement" : currentResult.score >= 55 ? "Partiellement" : "Non";
 
@@ -468,6 +447,7 @@ function renderFullReport() {
     sector,
     location,
     offer,
+    target,
     competitors,
     threatening,
     revenueLoss,
@@ -475,12 +455,16 @@ function renderFullReport() {
     riskText,
     maturity,
     digital,
+    competitorContext,
   });
 }
 
-function renderSaasReport({ company, sector, location, offer, competitors, threatening, revenueLoss, quickWins, riskText, maturity, digital }) {
+function renderSaasReport({ company, sector, location, offer, target, competitors, threatening, revenueLoss, quickWins, riskText, maturity, digital, competitorContext }) {
   const subScores = buildSaasSubScores(currentResult.score, digital);
-  const topOpportunity = `Votre offre "${offer}" est identifiable, mais la différence avec ${threatening.name} doit être plus immédiate.`;
+  const positioning = digital?.positioning;
+  const topOpportunity = competitorContext?.offerDepth === "complete"
+    ? `Votre offre "${offer}" semble plus complète. L’enjeu est de la rendre plus simple à comparer, pas de la réduire.`
+    : `Votre offre "${offer}" est identifiable, mais la différence avec ${threatening.name} doit être plus immédiate.`;
   const topRisk = `Les preuves visibles peuvent être moins fortes que chez certains concurrents, ce qui peut déplacer la confiance avant la prise de contact.`;
 
   return `
@@ -492,17 +476,18 @@ function renderSaasReport({ company, sector, location, offer, competitors, threa
           <span>/100</span>
         </div>
         <h3>${escapeHtml(maturity)}</h3>
-        <p>Score calculé à partir de votre site, vos réseaux sociaux, votre message et la comparaison avec vos concurrents.</p>
+        <p>Score calculé par le moteur propriétaire Kingcom à partir de votre site, vos réseaux sociaux, votre message et la comparaison avec vos concurrents.</p>
         ${renderSaasSubScoreBars(subScores)}
       </article>
 
       <article class="saas-card ai-insight-card">
-        <p class="eyebrow">AI Insights™</p>
+        <p class="eyebrow">AI Insights™ · invention exclusive Kingcom</p>
         <h3>${escapeHtml(company)} paraît crédible.</h3>
-        <p>Cependant, vos concurrents peuvent expliquer plus clairement leur valeur ajoutée. Cela peut influencer le choix de certains prospects au moment précis où ils comparent leurs options.</p>
+        <p>${escapeHtml(competitorContext?.summary || "Cependant, vos concurrents peuvent expliquer plus clairement leur valeur ajoutée. Cela peut influencer le choix de certains prospects au moment précis où ils comparent leurs options.")}</p>
         <div class="insight-pills">
           <span>${escapeHtml(location)}</span>
           <span>${escapeHtml(sector)}</span>
+          <span>Moteur Kingcom</span>
           <span>Risque ${escapeHtml(riskText)}</span>
         </div>
       </article>
@@ -529,13 +514,15 @@ function renderSaasReport({ company, sector, location, offer, competitors, threa
       </article>
     </section>
 
+    ${renderPositioningSection({ company, sector, location, offer, target, competitors, positioning, competitorContext })}
+
     <section class="saas-dashboard-grid competitor-focus-grid">
       <article class="saas-card competitor-focus">
         <p class="eyebrow">Concurrent principal</p>
         <h3>Concurrent à surveiller : ${escapeHtml(threatening.name)}</h3>
         <div class="threat-meter">
-          <div><b style="width:${Math.min(96, currentResult.score + 18)}%"></b></div>
-          <span>Score de menace : ${Math.min(96, currentResult.score + 18)}/100</span>
+          <div><b style="width:${threatening.score}%"></b></div>
+          <span>${threatening.scoreLabel} : ${threatening.score}/100</span>
         </div>
         <p>${escapeHtml(threatening.justification)}</p>
       </article>
@@ -555,11 +542,56 @@ function renderSaasReport({ company, sector, location, offer, competitors, threa
   `;
 }
 
+function renderPositioningSection({ company, sector, location, offer, target, competitors, positioning, competitorContext }) {
+  const ownPillars = positioning?.ownPillars?.length ? positioning.ownPillars : ["offre à clarifier", "raison de choisir à rendre visible"];
+  const competitorProfiles = positioning?.competitors || [];
+  const mainCompetitor = positioning?.strongestCompetitor?.accessible ? positioning.strongestCompetitor : getThreateningCompetitor(competitorProfiles);
+  const readableCompetitors = competitorProfiles.filter((item) => item.accessible);
+  const missing = ["cible claire", "offre explicite", "résultat attendu", "zone locale", "différence visible"]
+    .filter((pillar) => !ownPillars.includes(pillar));
+
+  return `
+    <section class="saas-dashboard-grid positioning-grid">
+      <article class="saas-card positioning-card">
+        <p class="eyebrow">Positionnement comparé · Kingcom</p>
+        <h3>Ce que le prospect doit comprendre avant de comparer.</h3>
+        <p>${escapeHtml(positioning?.summary || `${company} doit rendre son positionnement plus évident : pour qui, pour quel besoin, avec quel résultat et pourquoi vous plutôt qu’un autre acteur de ${sector}.`)}</p>
+        <div class="positioning-pills">
+          ${ownPillars.map((pillar) => `<span>${escapeHtml(pillar)}</span>`).join("")}
+        </div>
+      </article>
+
+      <article class="saas-card positioning-card">
+        <p class="eyebrow">Votre angle actuel</p>
+        <h3>${escapeHtml(offer)}</h3>
+        <p>Pour ${escapeHtml(target)}, à ${escapeHtml(location)}, l’offre doit être perçue comme une raison claire de vous contacter, pas seulement comme une prestation plus complète.</p>
+        <p class="positioning-note">${escapeHtml(competitorContext?.offerDepth === "complete"
+          ? "Votre avantage peut être la profondeur de l’accompagnement. Mais cette profondeur doit être transformée en bénéfices simples pour ne pas devenir difficile à comparer."
+          : "Votre avantage doit être formulé plus nettement pour éviter que le prospect compare seulement le prix, la proximité ou la rapidité de réponse.")}</p>
+      </article>
+
+      <article class="saas-card positioning-card">
+        <p class="eyebrow">Lecture concurrente</p>
+        <h3>${escapeHtml(mainCompetitor?.name || "Concurrent à confirmer")}</h3>
+        <p>${escapeHtml(mainCompetitor?.accessible && mainCompetitor.headline
+          ? `Premier message concurrent lu : "${mainCompetitor.headline}". Ce texte sert de point de comparaison avec votre propre positionnement.`
+          : "Aucun texte concurrent suffisamment lisible n’a été confirmé automatiquement. Pour comparer le positionnement avec précision, il faut fournir les URL ou regarder ces pages pendant l’échange inclus.")}</p>
+        <div class="positioning-compare">
+          <span>${escapeHtml(company)} : ${ownPillars.length} repère(s) de positionnement</span>
+          <span>Concurrents lisibles : ${readableCompetitors.length}/${competitors.length}</span>
+          <span>À clarifier : ${escapeHtml(missing[0] || "raison de choisir")}</span>
+        </div>
+      </article>
+    </section>
+  `;
+}
+
 function buildSaasSubScores(score, digital) {
   if (digital?.score) {
     return [
       { label: "SEO", score: Math.round((digital.score.seo / 20) * 100) },
       { label: "Clarté", score: Math.round((digital.score.offerClarity / 20) * 100) },
+      { label: "Positionnement", score: Math.round(((digital.score.positioning || digital.positioning?.specificityScore || 0) / 20) * 100) },
       { label: "Confiance", score: clampScore(score - 8) },
       { label: "Réseaux sociaux", score: Math.round(((digital.score.socialActivity + digital.score.socialEngagement) / 30) * 100) },
       { label: "Conversion", score: Math.round((digital.score.conversion / 10) * 100) },
@@ -570,6 +602,7 @@ function buildSaasSubScores(score, digital) {
   return [
     { label: "SEO", score: clampScore(score + 4) },
     { label: "Clarté", score: clampScore(score - 2) },
+    { label: "Positionnement", score: clampScore(score - 4) },
     { label: "Confiance", score: clampScore(score - 8) },
     { label: "Réseaux sociaux", score: clampScore(score - 13) },
     { label: "Conversion", score: clampScore(score - 5) },
@@ -735,6 +768,8 @@ function renderCoherenceAudit(coherence) {
 
 function renderBusinessLosses(analysis, { company, competitors }) {
   const inaccessible = [analysis.facebook, analysis.linkedin].filter((source) => !source.accessible).length;
+  const threatening = getThreateningCompetitor(analysis.competitors || []);
+  const competitorLabel = threatening?.name || "les concurrents indiqués";
   return `
     <section class="paid-section">
       <p class="eyebrow">6. Ce que cela peut faire perdre comme demandes</p>
@@ -742,7 +777,7 @@ function renderBusinessLosses(analysis, { company, competitors }) {
       <div class="card-list">
         ${[
           `Si le site de ${company} explique l’activité sans rendre la demande évidente, des prospects peuvent repartir sans cliquer.`,
-          `Si Facebook ou LinkedIn ne confirment pas clairement la même promesse, la comparaison avec ${competitors[0]} peut créer du doute.`,
+          `Si Facebook ou LinkedIn ne confirment pas clairement la même promesse, la comparaison avec ${competitorLabel} peut créer du doute.`,
           inaccessible ? `Les réseaux non lisibles automatiquement limitent la preuve sociale : ajoutez une capture ou les 3 derniers posts pour préciser l’analyse.` : `Les réseaux lisibles doivent confirmer la même promesse que le site pour éviter l’hésitation.`,
         ].map((text) => `<article class="consultant-card warning"><p>${escapeHtml(text)}</p></article>`).join("")}
       </div>
@@ -920,7 +955,8 @@ function renderCompetitorVisualTable({ company, competitor, dimensions }) {
   const rows = [
     ["Clarté de l’offre", dimensions[0].score >= 70 ? "✔" : dimensions[0].score >= 50 ? "➖" : "✖", "➖"],
     ["Preuves visibles", dimensions[1].score >= 70 ? "✔" : dimensions[1].score >= 50 ? "➖" : "✖", "➖"],
-    ["Différenciation", dimensions[2].score >= 70 ? "✔" : dimensions[2].score >= 50 ? "➖" : "✖", "➖"],
+    ["Offre complète", dimensions[2].score >= 45 ? "✔" : "➖", "➖"],
+    ["Offre facile à comparer", dimensions[2].score >= 70 ? "✔" : dimensions[2].score >= 50 ? "➖" : "✖", "➖"],
     ["Facilité de contact", dimensions[3].score >= 70 ? "✔" : dimensions[3].score >= 50 ? "➖" : "✖", "➖"],
     ["Présence locale", dimensions[4].score >= 70 ? "✔" : dimensions[4].score >= 50 ? "➖" : "✖", "➖"],
   ];
@@ -935,7 +971,7 @@ function renderCompetitorVisualTable({ company, competitor, dimensions }) {
           <div class="visual-row"><span>${escapeHtml(criterion)}</span><b>${you}</b><b>${them}</b></div>
         `).join("")}
       </div>
-      <p class="table-note">➖ indique un point à confirmer pendant l’appel 1h avec Lindsay. Le rapport 17€ limite volontairement la profondeur concurrentielle.</p>
+      <p class="table-note">➖ indique un point à confirmer pendant l’échange inclus de 30 min avec Lindsay. Une offre peut être plus complète tout en étant moins facile à comparer au premier regard.</p>
     </section>
   `;
 }
@@ -999,12 +1035,14 @@ function renderCompetitorReads(items) {
   return `
     <section class="paid-section">
       <p class="eyebrow">6. Pourquoi certains concurrents paraissent plus faciles à choisir</p>
-      <h3>Sans les dénigrer : ce qu’ils peuvent mieux faire percevoir.</h3>
+      <h3>La question n’est pas seulement “qui a la meilleure offre”, mais “qui est le plus facile à comprendre”.</h3>
       <div class="competitor-paid-list">
         ${items.map((item) => `
           <article class="competitor-paid">
             <h4>${escapeHtml(item.name)}</h4>
-            <p><b>Ce qu’il semble mieux montrer :</b> ${escapeHtml(item.better)}.</p>
+            <p><b>Observation réelle ou limite :</b> ${escapeHtml(item.observed)}</p>
+            <p><b>Lecture Kingcom :</b> ${escapeHtml(item.nuance)}</p>
+            <p><b>Ce qu’il peut mieux faire percevoir :</b> ${escapeHtml(item.better)}.</p>
             <p><b>Pourquoi cela rassure :</b> ${escapeHtml(item.reassurance)}</p>
             <p><b>Ce que vous pouvez récupérer :</b> ${escapeHtml(item.recover)}.</p>
             <p class="premium-note"><b>À approfondir dans le premium :</b> ${escapeHtml(item.premium)}.</p>
@@ -1015,13 +1053,14 @@ function renderCompetitorReads(items) {
   `;
 }
 
-function renderAiVerdict({ aiAnswer, company, sector, location, competitors, offer }) {
+function renderAiVerdict({ aiAnswer, company, sector, location, competitors, offer, threateningName }) {
+  const competitorLabel = threateningName || "les concurrents indiqués";
   return `
     <section class="paid-section verdict-section">
       <p class="eyebrow">7. Verdict IA</p>
       <h3>Une IA recommanderait-elle votre entreprise aujourd’hui ?</h3>
       <div class="verdict-pill">${escapeHtml(aiAnswer)}</div>
-      <p>Si un prospect demande à ChatGPT une entreprise de ${escapeHtml(sector)} à ${escapeHtml(location)}, l’IA pourrait citer ${escapeHtml(company)}, mais elle aurait du mal à justifier pourquoi elle devrait être choisie plutôt que ${escapeHtml(competitors[0])}, si l’offre "${escapeHtml(offer)}" n’est pas reliée à des raisons concrètes de prendre contact.</p>
+      <p>Si un prospect demande à ChatGPT une entreprise de ${escapeHtml(sector)} à ${escapeHtml(location)}, l’IA pourrait citer ${escapeHtml(company)}, mais elle aurait du mal à justifier pourquoi elle devrait être choisie plutôt que ${escapeHtml(competitorLabel)}, si l’offre "${escapeHtml(offer)}" n’est pas reliée à des raisons concrètes de prendre contact.</p>
       <div class="three-column">
         ${renderBulletBlock("Ce qui favorise une recommandation", [
           `${company} est associé à une zone claire : ${location}.`,
@@ -1029,7 +1068,7 @@ function renderAiVerdict({ aiAnswer, company, sector, location, competitors, off
           `L’offre "${offer}" peut servir de point d’entrée pour une recherche.`,
         ])}
         ${renderBulletBlock("Ce qui limite une recommandation", [
-          `La différence avec ${competitors[0]} peut rester difficile à expliquer.`,
+          `La différence avec ${competitorLabel} peut rester difficile à expliquer.`,
           `Les raisons de demander un devis à ${company} doivent être plus visibles.`,
           `Le bénéfice concret pour le prospect doit être plus immédiat.`,
         ])}
@@ -1043,14 +1082,15 @@ function renderAiVerdict({ aiAnswer, company, sector, location, competitors, off
   `;
 }
 
-function renderPriority({ company, offer, competitors }) {
+function renderPriority({ company, offer, competitors, threateningName }) {
+  const competitorLabel = threateningName || "les concurrents indiqués";
   return `
     <section class="paid-section priority-section">
       <p class="eyebrow">8. Priorité unique</p>
       <h3>Si vous ne deviez corriger qu’une seule chose cette semaine :</h3>
       <div class="priority-card">
         <h4>Rendre la première raison de contacter ${escapeHtml(company)} impossible à manquer.</h4>
-        <p><b>Pourquoi maintenant :</b> un prospect qui compare ${escapeHtml(company)} à ${escapeHtml(competitors[0])} doit comprendre en quelques secondes pourquoi demander un devis pour ${escapeHtml(offer)}.</p>
+        <p><b>Pourquoi maintenant :</b> un prospect qui compare ${escapeHtml(company)} à ${escapeHtml(competitorLabel)} doit comprendre en quelques secondes pourquoi demander un devis pour ${escapeHtml(offer)}.</p>
         <p><b>Résultat attendu :</b> moins d’hésitation avant la prise de contact et plus de demandes qui arrivent au lieu de partir chez un concurrent.</p>
         <p><b>Ce qu’il ne faut pas faire :</b> ajouter de longs paragraphes, multiplier les messages ou expliquer toute votre histoire avant d’avoir donné une raison claire de vous contacter.</p>
       </div>
@@ -1061,17 +1101,16 @@ function renderPriority({ company, offer, competitors }) {
 function renderPremiumTransition(threateningName) {
   return `
     <section class="paid-section premium-transition">
-      <p class="eyebrow">9. Étape suivante</p>
+      <p class="eyebrow">9. Étape suivante incluse</p>
       <h3>Vous savez maintenant quel concurrent mérite votre attention.</h3>
-      <h4>Mais savez-vous réellement pourquoi ${escapeHtml(threateningName)} gagne la comparaison ?</h4>
+      <h4>Utilisez votre échange de 30 min avec Lindsay pour déterminer quoi améliorer en priorité.</h4>
       <p>Vous savez ce qui vous aide, ce qui freine la prise de contact, ce que vos prospects peuvent ne pas comprendre et les premières actions à corriger.</p>
-      <p>La Carte des Opportunités Perdues™ vous montre :</p>
+      <p>Pendant votre rendez-vous inclus, nous pouvons clarifier :</p>
       <ul>
-        <li>les forces exactes de chaque concurrent</li>
-        <li>ce qui crée la confiance chez eux</li>
-        <li>les demandes que vous perdez peut-être aujourd’hui</li>
-        <li>les écarts qui vous coûtent des prises de contact</li>
-        <li>les actions prioritaires pour reprendre l’avantage</li>
+        <li>si votre offre est seulement plus complète ou réellement plus facile à choisir</li>
+        <li>ce que ${escapeHtml(threateningName)} rend peut-être plus évident pour vos prospects</li>
+        <li>les points à améliorer en premier pour récupérer plus de prises de contact</li>
+        <li>la suite possible avec Lindsay, uniquement si cela a du sens après l’échange</li>
       </ul>
     </section>
   `;
@@ -1113,9 +1152,9 @@ function buildObservedContext({ company, sector, location, offer, target, compet
       reading: `L’offre existe, mais elle doit être transformée en bénéfice visible pour ${target}.`,
     },
     {
-      label: "Concurrent cité",
-      value: competitors[0],
-      reading: `Ce concurrent est une alternative directe dans la tête du prospect, puisqu’il est cité dans votre comparaison.`,
+      label: "Concurrents indiqués",
+      value: competitors.filter(Boolean).join(", "),
+      reading: `Ces entreprises sont des alternatives possibles dans la tête du prospect. Le rapport ne désigne pas automatiquement la première comme la plus forte.`,
     },
   ];
 }
@@ -1150,23 +1189,152 @@ function buildDimensionScores(score) {
   ];
 }
 
-function buildThreateningCompetitor({ company, sector, location, offer, competitors }) {
-  const name = competitors[0];
+function buildOfferComparisonContext({ company, sector, offer, competitors, digital }) {
+  const website = digital?.website;
+  const competitorSites = digital?.competitors || [];
+  const threatening = getThreateningCompetitor(competitorSites);
+  const offerWords = meaningfulWords(offer);
+  const offerMentions = offerWords.filter((word) => includesText(website?.textSample, word)).length;
+  const offerDepth = offerWords.length >= 4 || offerMentions >= 2 ? "complete" : "simple";
+  const competitorName = threatening?.name || "un concurrent à confirmer";
+  const competitorHeadline = threatening?.h1?.[0] || threatening?.headline || threatening?.title || "";
+  const competitorCta = threatening?.ctas?.[0] || threatening?.cta || "";
+  const competitorOfferMentions = threatening
+    ? offerWords.filter((word) => includesText(`${threatening.title} ${threatening.metaDescription} ${threatening.h1?.join(" ")} ${threatening.textSample}`, word)).length
+    : 0;
+
+  const summary = threatening
+    ? `${company} peut avoir une offre plus complète, mais ${competitorName} dispose d’éléments lisibles automatiquement (${competitorHeadline || "titre ou message de page"}) qui peuvent rendre la comparaison plus rapide. Le sujet n’est pas de savoir qui travaille le mieux : c’est de savoir qui est compris le plus vite.`
+    : `${company} peut proposer une offre plus complète que certains concurrents. Mais si cette richesse n’est pas formulée simplement, un prospect peut choisir l’option qui semble la plus facile à comprendre. Aucun concurrent n’est désigné automatiquement comme meilleur tant que ses textes ne sont pas lisibles : cette partie doit être précisée pendant l’échange avec Lindsay.`;
+
+  return {
+    offerDepth,
+    competitorName,
+    competitorHeadline,
+    competitorCta,
+    competitorOfferMentions,
+    readableCompetitor: threatening,
+    summary,
+  };
+}
+
+function buildCompetitorReads({ company, sector, offer, competitors, digital, competitorContext }) {
+  const competitorSites = digital?.competitors || [];
+  return competitors.map((competitor, index) => {
+    const site = competitorSites.find((item) => item.name === competitor);
+    const readable = site?.accessible;
+    const headline = site?.h1?.[0] || site?.title || "";
+    const cta = site?.ctas?.[0] || "";
+    const offerIsComplete = competitorContext?.offerDepth === "complete";
+
+    return {
+      name: competitor,
+      observed: readable
+        ? `Texte lu : "${headline || site.title}".${cta ? ` Appel à l’action repéré : "${cta}".` : ""}`
+        : site?.reason || "Aucune URL concurrente lisible n’a été fournie : comparaison textuelle à confirmer.",
+      better: readable
+        ? `ce concurrent peut être plus rapide à comprendre si son titre et son appel à l’action répondent plus vite à la demande`
+        : `ce point reste à confirmer : le risque vient surtout de la façon dont ${company} rend son offre comparable`,
+      nuance: offerIsComplete
+        ? `Votre offre "${offer}" peut être plus complète que celle de ${competitor}. Mais une offre plus complète doit être découpée en bénéfices simples, sinon le prospect ne sait pas quoi comparer.`
+        : `Votre offre "${offer}" doit être formulée comme un résultat concret, sinon le prospect peut comparer uniquement le prix, la proximité ou la rapidité de réponse.`,
+      reassurance: readable
+        ? `Si ${competitor} montre plus vite ce qu’il fait, pour qui, et comment le contacter, le prospect dépense moins d’énergie avant de demander un devis.`
+        : `Sans lecture directe de ses textes, il ne faut pas conclure que ${competitor} est meilleur. Il faut vérifier pourquoi il peut paraître plus simple à choisir.`,
+      recover: offerIsComplete
+        ? `présenter ${offer} comme une solution complète, puis afficher 2 ou 3 bénéfices concrets pour rendre la comparaison favorable`
+        : `clarifier en une phrase pourquoi ${company} est un bon choix pour ${offer}`,
+      premium: [
+        `lecture détaillée des textes de ${competitor}`,
+        `comparaison des promesses et preuves visibles`,
+        `écarts précis entre offre complète et offre perçue comme simple`,
+      ][Math.min(index, 2)],
+    };
+  });
+}
+
+function buildThreateningCompetitor({ company, sector, location, offer, competitors, digital, competitorContext }) {
+  const readable = competitorContext?.readableCompetitor;
+  const name = readable?.name || "Concurrent à confirmer";
+  const headline = competitorContext?.competitorHeadline;
+  const score = readable ? scoreCompetitorThreat(readable) : 45;
   return {
     name,
+    score,
+    scoreLabel: readable ? "Score de menace" : "Menace à confirmer",
     observations: [
-      `${name} est le premier concurrent cité dans votre analyse, donc une alternative immédiate dans votre propre comparaison.`,
-      `${name} est comparé à ${company} pour une demande liée au secteur ${sector}.`,
-      `À ce stade, la différence entre ${company} et ${name} n’est pas encore formulée de manière assez évidente dans les éléments fournis.`,
+      readable && headline
+        ? `Texte concurrent réellement lu : "${headline}".`
+        : `Aucun concurrent n’est classé automatiquement comme le plus fort, car les textes concurrents n’ont pas été lus avec assez de fiabilité.`,
+      `${name} est comparé à ${company} pour une demande liée au secteur ${sector} à ${location}.`,
+      competitorContext?.offerDepth === "complete"
+        ? `L’offre "${offer}" peut être plus complète, mais elle doit devenir plus facile à comparer pour que cette richesse soit perçue comme un avantage.`
+        : `À ce stade, la différence entre ${company} et les concurrents indiqués n’est pas encore formulée de manière assez évidente dans les éléments fournis.`,
     ],
     effects: [
       `Un prospect qui découvre les deux entreprises peut contacter ${name} si son choix lui paraît plus simple.`,
       `Si ${name} répond plus vite à la question "pourquoi vous ?", la demande peut partir chez lui avant échange.`,
-      `Même avec une meilleure prestation, ${company} peut perdre une opportunité si la comparaison n’est pas cadrée.`,
+      `Même avec une offre plus complète, ${company} peut perdre une opportunité si le prospect ne comprend pas rapidement ce qu’il gagne en plus.`,
     ],
-    level: "Élevé",
-    justification: `${name} est menaçant parce qu’il est déjà dans le champ de comparaison. Le risque n’est pas qu’il soit forcément meilleur, mais qu’il soit plus vite compris au moment où le prospect hésite.`,
+    level: readable ? "Moyen à élevé" : "À confirmer",
+    justification: readable
+      ? `${readable.name} mérite l’attention parce que ses premiers textes sont lisibles et peuvent être comparés à ceux de ${company}. Le risque n’est pas qu’il soit forcément meilleur, mais qu’il soit plus vite compris au moment où le prospect hésite.`
+      : `Le concurrent le plus menaçant doit être confirmé. Sans texte concurrent lu automatiquement, le rapport ne désigne pas le premier concurrent comme meilleur par défaut.`,
   };
+}
+
+function getThreateningCompetitor(competitors = []) {
+  const readable = competitors.filter((item) => item?.accessible);
+  if (!readable.length) return null;
+  return readable
+    .map((item) => ({ ...item, threatScore: scoreCompetitorThreat(item) }))
+    .sort((a, b) => b.threatScore - a.threatScore)[0];
+}
+
+function scoreCompetitorThreat(item) {
+  const headline = item.h1?.[0] || item.headline || item.title || "";
+  const ctas = item.ctas || (item.cta ? [item.cta] : []);
+  const pillars = item.pillars || [];
+  let score = 35;
+  if (headline.length > 12) score += 14;
+  if (item.metaDescription) score += 8;
+  if (ctas.length) score += 12;
+  if (item.trust?.proofTerms?.length) score += 10;
+  if (item.conversion?.hasContactPath) score += 10;
+  if (item.clarity?.score) score += Math.min(12, Math.round(item.clarity.score / 2));
+  score += Math.min(14, pillars.length * 4);
+  return Math.max(35, Math.min(96, score));
+}
+
+function buildCompetitorComparisonRows({ competitors, digital }) {
+  const competitorSites = digital?.competitors || [];
+  return competitors.map((name) => {
+    const site = competitorSites.find((item) => item.name === name);
+    const score = site?.accessible ? scoreCompetitorThreat(site) : 45;
+    return {
+      name,
+      score,
+      label: site?.accessible ? "Concurrent analysé" : "Concurrent à confirmer",
+    };
+  });
+}
+
+function meaningfulWords(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .split(/[^a-z0-9]+/)
+    .filter((word) => word.length > 4)
+    .slice(0, 10);
+}
+
+function includesText(haystack, needle) {
+  return String(haystack || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .includes(String(needle || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
 }
 
 function clampScore(score) {
@@ -1183,23 +1351,20 @@ function buildComparisonScores(score) {
 async function completeUpsell() {
   if (!currentContactId) return;
   upsellButton.disabled = true;
-  upsellButton.textContent = "Préparation de la session 1h…";
+  upsellButton.textContent = "Préparation de l’échange…";
 
   if (currentContactId === "example") {
-    trackEvent("upsell_97_purchased");
+    trackEvent("call_option_selected");
     upsellButton.disabled = false;
-    upsellButton.textContent = "Réserver l’appel 1h — 75€";
+    upsellButton.textContent = "Réserver mon échange de 30 min";
     showView("upsellSuccess");
     return;
   }
 
-  const redirected = await startMolliePayment(["UPSELL_97"]);
-  if (redirected) return;
-
-  await postJson("/api/simulate-purchase", { contactId: currentContactId, productCode: "UPSELL_97" });
-  trackEvent("upsell_97_purchased");
+  await postJson("/api/commercial-event", { contactId: currentContactId, eventName: "RDV_INTERESSE" });
+  trackEvent("call_option_selected");
   upsellButton.disabled = false;
-  upsellButton.textContent = "Réserver l’appel 1h — 75€";
+  upsellButton.textContent = "Réserver mon échange de 30 min";
   showView("upsellSuccess");
 }
 

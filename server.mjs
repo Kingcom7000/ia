@@ -245,6 +245,7 @@ async function handleTrackEvent(input) {
     "upsell_97_purchased",
     "arthur_offer_viewed",
     "arthur_trial_started",
+    "call_option_selected",
     "abandoned_checkout",
   ]);
   const eventName = input.eventName;
@@ -669,12 +670,14 @@ function toBrevoContact(input, analysis) {
 }
 
 async function analyzeDigitalPresence(input) {
-  const [website, facebook, linkedin] = await Promise.all([
+  const [website, facebook, linkedin, competitors] = await Promise.all([
     analyzeWebsite(input.website, input),
     analyzeSocial("facebook", input.facebook, input),
     analyzeSocial("linkedin", input.linkedin, input),
+    analyzeCompetitorWebsites(input),
   ]);
   const coherence = analyzeCoherence(input, website, facebook, linkedin);
+  const positioning = analyzePositioning(input, website, competitors);
   const score = calculateDigitalScore(input, website, facebook, linkedin, coherence);
 
   return {
@@ -682,9 +685,49 @@ async function analyzeDigitalPresence(input) {
     website,
     facebook,
     linkedin,
+    competitors,
+    positioning,
     coherence,
     generatedAt: new Date().toISOString(),
   };
+}
+
+async function analyzeCompetitorWebsites(input) {
+  const competitors = [input.competitor1, input.competitor2, input.competitor3].filter(Boolean);
+  return Promise.all(competitors.map(async (competitor, index) => {
+    if (!looksLikeUrl(competitor)) {
+      return {
+        name: competitor,
+        rank: index + 1,
+        accessible: false,
+        reason: "Nom fourni sans URL : comparaison textuelle à confirmer pendant l’échange avec Lindsay.",
+      };
+    }
+
+    const analysis = await analyzeWebsite(competitor, input);
+    return {
+      name: competitor,
+      rank: index + 1,
+      accessible: analysis.accessible,
+      reason: analysis.reason,
+      url: analysis.url,
+      title: analysis.title,
+      metaDescription: analysis.metaDescription,
+      h1: analysis.h1,
+      ctas: analysis.ctas,
+      textSample: analysis.textSample,
+      clarity: analysis.clarity,
+      trust: analysis.trust,
+      conversion: analysis.conversion,
+      observations: analysis.accessible
+        ? [
+          analysis.title ? `Title concurrent lu : "${analysis.title}".` : "Title concurrent non lisible.",
+          analysis.h1?.length ? `H1 concurrent lu : "${analysis.h1[0]}".` : "H1 concurrent non lisible.",
+          analysis.ctas?.length ? `Appels à l’action concurrents repérés : ${analysis.ctas.slice(0, 3).join(", ")}.` : "Aucun appel à l’action concurrent évident n’a été repéré.",
+        ]
+        : [analysis.reason],
+    };
+  }));
 }
 
 async function analyzeWebsite(url, input) {
@@ -831,6 +874,98 @@ function analyzeCoherence(input, website, facebook, linkedin) {
   };
 }
 
+function analyzePositioning(input, website, competitors = []) {
+  const ownText = [
+    input.company,
+    input.sector,
+    input.location,
+    input.mainOffer,
+    input.targetClient,
+    input.commercialMessage,
+    website?.title,
+    website?.metaDescription,
+    ...(website?.h1 || []),
+    website?.textSample,
+  ].join(" ");
+  const ownPillars = extractPositioningPillars(input, ownText);
+  const readableCompetitors = competitors.filter((competitor) => competitor.accessible);
+  const competitorProfiles = competitors.map((competitor) => {
+    const text = [
+      competitor.title,
+      competitor.metaDescription,
+      ...(competitor.h1 || []),
+      competitor.textSample,
+    ].join(" ");
+    return {
+      name: competitor.name,
+      accessible: competitor.accessible,
+      reason: competitor.reason,
+      headline: competitor.h1?.[0] || competitor.title || "",
+      cta: competitor.ctas?.[0] || "",
+      pillars: competitor.accessible ? extractPositioningPillars(input, text) : [],
+    };
+  });
+
+  const strongestCompetitor = chooseStrongestCompetitor(competitorProfiles)
+    || { name: "Concurrent à confirmer", accessible: false, reason: "Aucun concurrent lisible automatiquement." };
+
+  const specificityScore = points([
+    ownPillars.includes("cible claire"),
+    ownPillars.includes("offre explicite"),
+    ownPillars.includes("résultat attendu"),
+    ownPillars.includes("zone locale"),
+    ownPillars.includes("différence visible"),
+  ], 20);
+
+  return {
+    ownPillars,
+    specificityScore,
+    strongestCompetitor,
+    competitors: competitorProfiles,
+    summary: buildPositioningSummary(input, ownPillars, strongestCompetitor, readableCompetitors.length),
+  };
+}
+
+function extractPositioningPillars(input, text) {
+  const pillars = [];
+  const haystack = String(text || "").toLowerCase();
+  if (includesAny(haystack, [input.targetClient])) pillars.push("cible claire");
+  if (includesAny(haystack, [input.mainOffer, input.sector])) pillars.push("offre explicite");
+  if (findTerms(haystack, ["résultat", "gain", "plus", "moins", "sans", "rapide", "simple", "sérénité", "tranquillité", "rentable", "clients", "devis"]).length) pillars.push("résultat attendu");
+  if (includesAny(haystack, [input.location])) pillars.push("zone locale");
+  if (findTerms(haystack, ["spécialiste", "sur-mesure", "complet", "accompagnement", "expert", "certifié", "garantie", "méthode", "exclusif", "unique"]).length) pillars.push("différence visible");
+  return Array.from(new Set(pillars));
+}
+
+function chooseStrongestCompetitor(competitors = []) {
+  const readable = competitors.filter((competitor) => competitor.accessible);
+  if (!readable.length) return null;
+  return readable
+    .map((competitor) => ({ ...competitor, positioningScore: scoreCompetitorPositioning(competitor) }))
+    .sort((a, b) => b.positioningScore - a.positioningScore)[0];
+}
+
+function scoreCompetitorPositioning(competitor) {
+  let score = 0;
+  if ((competitor.headline || "").length > 12) score += 25;
+  if (competitor.cta) score += 20;
+  score += Math.min(25, (competitor.pillars || []).length * 5);
+  if ((competitor.headline || "").length > 45) score += 8;
+  return score;
+}
+
+function buildPositioningSummary(input, ownPillars, strongestCompetitor, readableCount) {
+  const missing = ["cible claire", "offre explicite", "résultat attendu", "zone locale", "différence visible"]
+    .filter((pillar) => !ownPillars.includes(pillar));
+  if (readableCount > 0 && strongestCompetitor?.headline) {
+    return `${input.company} doit être comparée à ses concurrents sur son positionnement, pas seulement sur sa présence. Le concurrent "${strongestCompetitor.name}" affiche un premier message lisible : "${strongestCompetitor.headline}". Votre enjeu est de rendre aussi lisible votre cible, votre offre et la raison de vous choisir.`;
+  }
+  if (!missing.length) {
+    return `${input.company} possède déjà les bases d’un positionnement lisible : cible, offre, zone, résultat attendu et différence. L’enjeu n’est donc pas de tout changer, mais de rendre cette différence plus facile à comparer face aux concurrents réellement observés.`;
+  }
+  return `${input.company} indique une offre et un marché, mais certains éléments de positionnement restent à rendre plus évidents : ${missing.slice(0, 3).join(", ") || "la raison de vous choisir"}. Les textes concurrents devront être confirmés avec leurs URL ou pendant l’échange inclus.`;
+}
+
 function calculateDigitalScore(input, website, facebook, linkedin, coherence) {
   const seo = website.accessible
     ? points([
@@ -841,9 +976,16 @@ function calculateDigitalScore(input, website, facebook, linkedin, coherence) {
       website.seo.titleMentionsOffer || website.seo.descriptionMentionsOffer,
     ], 20)
     : (input.website ? 5 : 0);
+  const formPositioning = points([
+    String(input.mainOffer || "").length > 12,
+    String(input.targetClient || "").length > 12,
+    String(input.commercialMessage || "").length > 25,
+    Boolean(input.sector),
+    Boolean(input.location),
+  ], 20);
   const offerClarity = website.accessible
-    ? clamp(Math.round(website.clarity.score), 0, 20)
-    : Math.min(20, 8 + Math.round(((input.mainOffer || "").length / 80) * 8));
+    ? clamp(Math.round((website.clarity.score * 0.55) + (formPositioning * 0.45)), 0, 20)
+    : formPositioning;
   const coherenceScore = clamp(6 + coherence.offerAligned * 4 + Math.min(2, coherence.locationMentions) * 2, 0, 20);
   const readableSocials = [facebook, linkedin].filter((source) => source.accessible);
   const socialActivity = readableSocials.length
@@ -860,6 +1002,7 @@ function calculateDigitalScore(input, website, facebook, linkedin, coherence) {
   return {
     seo,
     offerClarity,
+    positioning: formPositioning,
     coherence: coherenceScore,
     socialActivity,
     socialEngagement,
@@ -921,6 +1064,11 @@ function normalizeUrl(value) {
   if (!trimmed) return "";
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   return `https://${trimmed}`;
+}
+
+function looksLikeUrl(value) {
+  const trimmed = String(value || "").trim();
+  return /^https?:\/\//i.test(trimmed) || /^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(trimmed);
 }
 
 function extractFirst(html, regex) {
@@ -1098,7 +1246,7 @@ function productFromCode(code) {
   const products = {
     CHECKUP_27: { code, name: "Le Révélateur de Clients Perdus™", amountCents: 1700 },
     BUMP_17: { code, name: "Le Décodeur de Prospects™", amountCents: 1700 },
-    UPSELL_97: { code, name: "Session stratégique 1h avec Lindsay", amountCents: 7500 },
+    UPSELL_97: { code, name: "Échange de 30 min avec Lindsay", amountCents: 0 },
     CALL_297: { code, name: "Session Stratégique Acquisition™", amountCents: 29700 },
     ACCOMPAGNEMENT: { code, name: "Responsable Communication Externalisée", amountCents: 0 },
   };

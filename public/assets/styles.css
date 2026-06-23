@@ -2019,6 +2019,19 @@ h1 {
   margin: 24px 0 4px;
 }
 
+.proprietary-note {
+  max-width: 680px;
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  color: #334155;
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(14, 165, 233, .16);
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
 .hero-sources span,
 .insight-pills span,
 .locked-saas-grid span {
@@ -2684,5 +2697,186 @@ textarea:focus {
 
   .domination-score strong {
     font-size: 86px;
+  }
+}
+
+/* Production readability fixes: keep headings inside cards and reduce oversized type. */
+h1 {
+  font-size: clamp(40px, 5.2vw, 72px);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+h2 {
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 1.06;
+  text-wrap: balance;
+}
+
+h3,
+.saas-card h3,
+.choice-card h3,
+.paid-section h3,
+.competitor-strip h3,
+.locked-zone h3 {
+  font-size: clamp(22px, 2.1vw, 32px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.session-intro {
+  max-width: 980px;
+}
+
+.session-intro h1 {
+  max-width: 980px;
+  font-size: clamp(44px, 6vw, 76px);
+}
+
+.session-intro p,
+.result-copy p,
+.choice-heading p:not(.eyebrow),
+.choice-card p,
+.saas-card p {
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.result-triad {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+.emotion-card {
+  min-height: 0;
+  align-content: start;
+  gap: 18px;
+}
+
+.emotion-card strong {
+  margin: 8px 0 0;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  font-size: clamp(22px, 2vw, 30px);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.emotion-card p {
+  margin-top: auto;
+}
+
+.subscore-card strong {
+  font-size: clamp(22px, 2vw, 28px);
+}
+
+.score-spectacular strong {
+  font-size: clamp(82px, 10vw, 124px);
+}
+
+.domination-score strong {
+  font-size: clamp(72px, 8vw, 112px);
+}
+
+.price-row.compact {
+  margin: 10px 0;
+  padding: 12px 0;
+}
+
+.price-row.compact strong {
+  font-size: 28px;
+}
+
+.choice-grid.single {
+  grid-template-columns: minmax(0, 720px);
+}
+
+.call-only-card {
+  gap: 12px;
+}
+
+.positioning-grid {
+  margin-top: 24px;
+}
+
+.positioning-card {
+  border-color: rgba(14, 165, 233, 0.18);
+}
+
+.positioning-card .positioning-note {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(14, 165, 233, 0.08);
+  color: #0f172a;
+}
+
+.positioning-pills,
+.positioning-compare {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.positioning-pills span,
+.positioning-compare span {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 8px 11px;
+  border-radius: 999px;
+  background: #eef6ff;
+  color: #075985;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.positioning-compare {
+  flex-direction: column;
+}
+
+.positioning-compare span {
+  width: fit-content;
+  border-radius: 14px;
+}
+
+@media (max-width: 1100px) {
+  .result-triad {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  h1,
+  .session-intro h1 {
+    font-size: clamp(34px, 10vw, 46px);
+    line-height: 1.06;
+  }
+
+  h2 {
+    font-size: clamp(28px, 8vw, 38px);
+  }
+
+  h3,
+  .saas-card h3,
+  .choice-card h3,
+  .paid-section h3,
+  .locked-zone h3 {
+    font-size: 24px;
+  }
+
+  .result-triad {
+    grid-template-columns: 1fr;
+  }
+
+  .emotion-card strong {
+    font-size: 24px;
+  }
+
+  .score-spectacular strong,
+  .domination-score strong {
+    font-size: 76px;
   }
 }

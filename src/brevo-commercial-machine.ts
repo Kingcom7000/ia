@@ -351,7 +351,7 @@ export class BrevoCommercialMachine {
       "Nouveau Lead": 0,
       "Analyse Terminée": 0,
       "Client 27€": 17,
-      "Client 97€": 75,
+      "Client 97€": 0,
       "RDV Réservé": 297,
       "Proposition Envoyée": 1200,
       "Client Accompagnement": 1200,
@@ -430,8 +430,8 @@ export async function runPurchaseWorkflow(params: {
   const purchaseMap: Record<PurchaseTag, { list: string; stage: DealStage; label: string }> = {
     CHECKUP_27: { list: "Clients 27€", stage: "Client 27€", label: "Le Révélateur de Clients Perdus™ 17€" },
     BUMP_17: { list: "Clients Décodeur", stage: params.contact.dealStage ?? "Client 27€", label: "Le Décodeur de Prospects™ 17€" },
-    UPSELL_97: { list: "Clients 97€", stage: "Client 97€", label: "Session stratégique 1h avec Lindsay 75€" },
-    CALL_297: { list: "Clients Session Stratégique", stage: "Client 97€", label: "Session stratégique 1h avec Lindsay 75€" },
+    UPSELL_97: { list: "Clients 97€", stage: "Client 97€", label: "Échange de 30 min avec Lindsay" },
+    CALL_297: { list: "Clients Session Stratégique", stage: "Client 97€", label: "Échange de 30 min avec Lindsay" },
     ACCOMPAGNEMENT: { list: "Clients Accompagnement", stage: "Client Accompagnement", label: "Responsable Communication Externalisée" },
   };
 
